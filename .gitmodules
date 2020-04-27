@@ -43,9 +43,6 @@
 [submodule "extensions/arduino"]
 	path = extensions/arduino
 	url = https://github.com/NetLogo/Arduino-Extension/
-[submodule "extensions/vid"]
-	path = extensions/vid
-	url = https://github.com/NetLogo/vid.git
 [submodule "extensions/view2.5d"]
 	path = extensions/view2.5d
 	url = https://github.com/NetLogo/View2.5D.git
