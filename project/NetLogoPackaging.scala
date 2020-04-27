@@ -25,10 +25,8 @@ object NetLogoPackaging {
   lazy val resaveModels            = taskKey[Unit]("prep models library for packaging")
   lazy val generateLocalWebsite    = taskKey[File]("package the web download pages")
   lazy val localSiteTarget         = settingKey[File]("directory into which local copy of the site is built")
-  lazy val mathematicaRoot         = settingKey[File]("root of Mathematica-Link directory")
   lazy val netLogoLongVersion      = settingKey[String]("Long version number (including trailing zero) of NetLogo under construction")
   lazy val netLogoRoot             = settingKey[File]("Root directory of NetLogo project")
-  lazy val packagedMathematicaLink = taskKey[File]("Mathematica link, ready for packaging")
   lazy val packageLinuxAggregate   = inputKey[File]("package all linux apps into a single directory")
   lazy val packageMacAggregate     = taskKey[File]("package all mac apps into a dmg")
   lazy val packageWinAggregate     = inputKey[File]("package all win apps into a single directory")
@@ -76,7 +74,6 @@ object NetLogoPackaging {
   def settings(netlogo: Project, macApp: Project, behaviorsearchProject: Project): Seq[Setting[_]] = Seq(
     netLogoRoot     := (baseDirectory in netlogo).value,
     behaviorsearchRoot := netLogoRoot.value.getParentFile / "behaviorsearch",
-    mathematicaRoot := netLogoRoot.value.getParentFile / "Mathematica-Link",
     configRoot      := baseDirectory.value / "configuration",
     localSiteTarget := target.value / marketingVersion.value,
     aggregateJDKParser := Def.toSParser(jdkParser),
@@ -87,7 +84,6 @@ object NetLogoPackaging {
       (allDocs in netlogo).value
       (allPreviews in netlogo).toTask("").value
       resaveModels.value
-      RunProcess(Seq("sbt", "package"), mathematicaRoot.value, s"package mathematica link")
       (packageBin in Compile in behaviorsearchProject).value
     },
     resaveModels := {
@@ -96,22 +92,9 @@ object NetLogoPackaging {
         workingDirectory = baseDirectory(_.getParentFile)).toTask("").value
     },
     resaveModels := (resaveModels dependsOn (extensions in netlogo)).value,
-    packagedMathematicaLink := {
-      val mathematicaLinkDir = mathematicaRoot.value
-      IO.createDirectory(target.value / "Mathematica Link")
-      Seq(
-        mathematicaLinkDir / "NetLogo-Mathematica Tutorial.nb",
-        mathematicaLinkDir / "NetLogo-Mathematica Tutorial.pdf",
-        mathematicaLinkDir / "NetLogo.m",
-        mathematicaLinkDir / "target" / "mathematica-link.jar")
-        .foreach { f =>
-          FileActions.copyFile(f, target.value / "Mathematica Link" / f.getName)
-        }
-      target.value / "Mathematica Link"
-    },
     aggregateOnlyFiles := {
       Mustache(baseDirectory.value / "readme.md", target.value / "readme.md", buildVariables.value)
-      Seq(target.value / "readme.md", netLogoRoot.value / "NetLogo User Manual.pdf", packagedMathematicaLink.value)
+      Seq(target.value / "readme.md", netLogoRoot.value )
     },
     buildVariables := Map[String, String](
       "version"            -> marketingVersion.value,
