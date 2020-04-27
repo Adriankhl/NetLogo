@@ -36,14 +36,17 @@ object Docs {
         extensionDocsGen.value)
     },
     allDocs := {
-      htmlDocs.value :+ manualPDF.value :+ apiScaladoc.value
+      // Dont generate pdf to pdf to avoid the requirement of qt-patched Wkhtmltopdf
+      // htmlDocs.value :+ manualPDF.value :+ apiScaladoc.value
+      htmlDocs.value :+ apiScaladoc.value
     },
     htmlDocs := {
       netLogoDocs.value.generateHTML(buildVariables.value, documentedExtensions.value)
     },
-    manualPDF := {
-      netLogoDocs.value.generatePDF(buildVariables.value, documentedExtensions.value)
-    },
+    // Dont generate pdf to pdf to avoid the requirement of qt-patched Wkhtmltopdf
+    // manualPDF := {
+    //    netLogoDocs.value.generatePDF(buildVariables.value, documentedExtensions.value)
+    // },
     extensionDocConfigFile := {
       baseDirectory.value.getParentFile / "project" / "documentation.conf"
     },
